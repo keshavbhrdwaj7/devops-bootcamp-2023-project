@@ -1,17 +1,40 @@
-pipeline {
-    agent any
 
+
+
+pipeline{ 
+    agent {
+        kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                    - name: aws
+                      image: amazon/aws-cli
+                      command: 
+                      - sh
+                      tty: true
+                      volumeMounts:     
+                        - name: shared-data
+                          mountPath: /mnt/shared-data
+
+                  volumes:  
+                    - name: dind-storage      
+                      emptyDir: {}
+                    - name: shared-data
+                      emptyDir: {}
+            '''    
+        }
+    }
     stages {
-        stage("Level 1") {
+        stage("hello keshav"){
             steps {
-
-                sh'''
-                
-                echo "Hello my name is Keshav"
-
-                '''
+                container('aws') {
+                    sh '''
+                        echo "hello keshav"
+                    '''
+                }                
             }
         }
     }
-
 }
